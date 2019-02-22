@@ -41,7 +41,8 @@
         .setRecyclable(true)                       //循环滚动，默认true
         .setReversible(false)                      //反转滚动，默认false
         .setScrollDuration(2000)                   //单张滚动时长，默认1s
-        .enableCarousel(true)                      //开启滚动，默认true
+        .enableCarousel(true)                      //是否支持轮播，默认true
+        .setAutoCarousel(true)                     //自动开始/结束轮播，默认true
         .build()
   params.onParamsChanged()                         //支持动态设置参数，设置后调用改方法使其生效
 ```
@@ -50,13 +51,16 @@
 ```
   viewPager.adapter = Your adapter
   val carouselViewPager = CarouselViewPager(viewPager, params) //绑定viewpager，params可选
+  //在适当的时候开始/停止轮播（可选）
+  carouselViewPager.onStart()  //开始轮播
+  carouselViewPager.onStop()   //停止轮播
   //TODO 为adapter设置数据
 ```
 
-##### 四、设置生命周期
+##### 四、设置生命周期（可选）
 
 1、在activity或fragment的适当时机，如onStart的时候调用viewpager.onStart
 
 2、在activity或fragment的适当时机，如onStop的时候调用viewpager.onStop
 
-**注:** 如果viewPager.context为AppCompatActivity，会自动跟随activity的onStart/onStop调用
+**注:** 若params.autoCarousel为true时，且viewPager.context为AppCompatActivity的实例，则自动跟随activity的onStart/onStop调用

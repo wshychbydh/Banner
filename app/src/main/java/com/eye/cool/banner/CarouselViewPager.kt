@@ -33,7 +33,6 @@ class CarouselViewPager constructor(private val viewPager: ViewPager,
     val adapter = (viewPager.adapter as ICarousel)
     params = configParams ?: adapter.params
     adapter.params = params
-    getLifecycle(viewPager.context)?.addObserver(this)
     registerParamsObserver()
     configViewPagerWithParams()
   }
@@ -52,6 +51,14 @@ class CarouselViewPager constructor(private val viewPager: ViewPager,
     viewPager.setOnTouchListener(this)
     scroller = PageScroller(viewPager.context, params.scrollDuration, params.interpolator)
     setPageChangeDuration(scroller)
+    if (params.carouselAble) {
+      val lifecycle = getLifecycle(viewPager.context)
+      if (params.autoCarousel) {
+        lifecycle?.addObserver(this)
+      } else {
+        lifecycle?.removeObserver(this)
+      }
+    }
   }
 
   private fun registerParamsObserver() {
