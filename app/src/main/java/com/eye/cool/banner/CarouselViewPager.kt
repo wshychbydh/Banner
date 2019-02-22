@@ -108,7 +108,7 @@ class CarouselViewPager constructor(private val viewPager: ViewPager,
   }
 
   /**
-   * 如果viewPage.context为AppCompatActivity，会跟谁自动调用activity的onStart自动调用
+   * 如果viewPager.context为AppCompatActivity，会自动跟随activity的onStart调用
    */
   @OnLifecycleEvent(Lifecycle.Event.ON_START)
   fun onStart() {
@@ -119,7 +119,7 @@ class CarouselViewPager constructor(private val viewPager: ViewPager,
   }
 
   /**
-   * 如果viewPage.context为AppCompatActivity，会跟谁自动调用activity的onStop自动调用
+   * 如果viewPager.context为AppCompatActivity，会自动跟随activity的onStop调用
    */
   @OnLifecycleEvent(Lifecycle.Event.ON_STOP)
   fun onStop() {

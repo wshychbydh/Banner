@@ -3,7 +3,7 @@ package com.eye.cool.banner
 /**
  * Created by cool on 2018/4/18.
  */
-internal interface ICarouselData<T> : ICarousel {
+interface ICarouselData<T> : ICarousel {
 
   var data: ArrayList<T>
 
