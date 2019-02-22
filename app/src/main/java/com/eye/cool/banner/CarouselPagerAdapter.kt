@@ -52,10 +52,6 @@ abstract class CarouselPagerAdapter<T> : PagerAdapter(), ICarouselData<T> {
     }
   }
 
-  fun onParamsChanged() {
-    params.onParamsChanged()
-  }
-
   override fun isViewFromObject(view: View, `object`: Any): Boolean {
     return view === `object`
   }

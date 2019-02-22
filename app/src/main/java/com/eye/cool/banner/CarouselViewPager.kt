@@ -1,10 +1,10 @@
 package com.eye.cool.banner
 
-import android.annotation.SuppressLint
 import android.arch.lifecycle.Lifecycle
 import android.arch.lifecycle.LifecycleObserver
 import android.arch.lifecycle.OnLifecycleEvent
 import android.content.Context
+import android.database.DataSetObserver
 import android.support.v4.view.ViewPager
 import android.support.v7.app.AppCompatActivity
 import android.view.MotionEvent
@@ -18,23 +18,26 @@ import android.widget.Scroller
  */
 class CarouselViewPager constructor(private val viewPager: ViewPager,
                                     configParams: CarouselParams? = null)
-  : View.OnTouchListener, Runnable, LifecycleObserver {
+  : View.OnTouchListener, Runnable, LifecycleObserver, DataSetObserver() {
 
   constructor(viewPager: ViewPager) : this(viewPager, null)
 
+  @Volatile
   private var params: CarouselParams
 
+  @Volatile
   private lateinit var scroller: PageScroller
 
   init {
-    if (viewPager.adapter !is ICarousel) {
-      throw IllegalArgumentException("ViewPager's adapter must be implement ICarousel.")
-    }
+    checkAdapter()
     val adapter = (viewPager.adapter as ICarousel)
     params = configParams ?: adapter.params
     adapter.params = params
-    registerParamsObserver()
+    viewPager.adapter!!.registerDataSetObserver(this)
+    viewPager.descendantFocusability = ViewGroup.FOCUS_BEFORE_DESCENDANTS
+    viewPager.setOnTouchListener(this)
     configViewPagerWithParams()
+    viewPager.currentItem = (viewPager.adapter as ICarousel).getInitItem()
   }
 
   private fun getLifecycle(context: Context): Lifecycle? {
@@ -44,31 +47,24 @@ class CarouselViewPager constructor(private val viewPager: ViewPager,
     return null
   }
 
-  @SuppressLint("ClickableViewAccessibility")
-  private fun configViewPagerWithParams() {
-    viewPager.currentItem = (viewPager.adapter as ICarousel).getInitItem()
-    viewPager.descendantFocusability = ViewGroup.FOCUS_BEFORE_DESCENDANTS
-    viewPager.setOnTouchListener(this)
-    scroller = PageScroller(viewPager.context, params.scrollDuration, params.interpolator)
-    setPageChangeDuration(scroller)
-    if (params.carouselAble) {
-      val lifecycle = getLifecycle(viewPager.context)
-      if (params.autoCarousel) {
-        lifecycle?.addObserver(this)
-      } else {
-        lifecycle?.removeObserver(this)
-      }
-    }
+  override fun onChanged() {
+    checkAdapter()
+    params = (viewPager.adapter as ICarousel).params
+    viewPager.adapter!!.unregisterDataSetObserver(this)
+    onStop()
+    configViewPagerWithParams()
+    onStart()
+    viewPager.adapter!!.registerDataSetObserver(this)
   }
 
-  private fun registerParamsObserver() {
-    params.registerParamsObserver(object : CarouselParams.ParamsObserver {
-      override fun onParamsChanged() {
-        onStop()
-        configViewPagerWithParams()
-        onStart()
-      }
-    })
+  private fun configViewPagerWithParams() {
+    scroller = PageScroller(viewPager.context, params.scrollDuration, params.interpolator)
+    setPageChangeDuration(scroller)
+    val lifecycle = getLifecycle(viewPager.context)
+    lifecycle?.removeObserver(this)
+    if (params.carouselAble && params.autoCarousel) {
+      lifecycle?.addObserver(this)
+    }
   }
 
   override fun run() {
@@ -97,13 +93,18 @@ class CarouselViewPager constructor(private val viewPager: ViewPager,
         if (params.pauseWhenTouch) {
           onStart()
         }
-        if (System.nanoTime() - touchWhen < 1000) {
-          v?.performClick()
+        if (event.action == MotionEvent.ACTION_UP) {
+          if (v?.isClickable == true) {
+            val duration = System.currentTimeMillis() - touchWhen
+            if (duration < 400L) {
+              v.performClick()
+            }
+          }
         }
       }
       else -> {
         if (event.action == MotionEvent.ACTION_DOWN) {
-          touchWhen = System.nanoTime()
+          touchWhen = System.currentTimeMillis()
         }
         scroller.isDrag = true
         if (params.pauseWhenTouch) {
@@ -111,7 +112,7 @@ class CarouselViewPager constructor(private val viewPager: ViewPager,
         }
       }
     }
-    return false
+    return !params.scrollAble
   }
 
   /**
@@ -119,7 +120,10 @@ class CarouselViewPager constructor(private val viewPager: ViewPager,
    */
   @OnLifecycleEvent(Lifecycle.Event.ON_START)
   fun onStart() {
-    if (params.carouselAble && viewPager.adapter?.count ?: 0 > 1) {
+    if (params.carouselAble) {
+      checkAdapter()
+      val count = (viewPager.adapter as ICarousel).getDataSize()
+      if (count <= 0 || (count == 1 && !params.scrollWhenOne)) return
       viewPager.removeCallbacks(this)
       viewPager.postDelayed(this, params.interval)
     }
@@ -131,5 +135,14 @@ class CarouselViewPager constructor(private val viewPager: ViewPager,
   @OnLifecycleEvent(Lifecycle.Event.ON_STOP)
   fun onStop() {
     viewPager.removeCallbacks(this)
+  }
+
+  private fun checkAdapter() {
+    if (viewPager.adapter == null) {
+      throw IllegalArgumentException("ViewPager's adapter can not be null.")
+    }
+    if (viewPager.adapter !is ICarousel) {
+      throw IllegalArgumentException("ViewPager's adapter must be implement ICarousel.")
+    }
   }
 }

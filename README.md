@@ -11,9 +11,13 @@
 
 4、支持自定义轮播方向
 
-4、支持手指触摸后不进行轮播
+4、支持手指触摸后不进行轮播及禁用滑动开关
 
 5、支持自动伴随Activity的生命周期开始/结束轮播
+
+6、默认指示器
+
+7、支持单张轮播开关
 
 ### 使用方法：
 
@@ -26,7 +30,6 @@
 ```
     adapter.setData(T)     //设置数据
     adapter.appendData(T)  //添加数据
-    adapter.onParamsChanged() //当ViewPager的配置变化后手动调用
     adapter.getDataSize()  //获取内容的真实条数
 ```
 
@@ -34,33 +37,59 @@
 
 ```
   val params = CarouselParams.Builder()
-        .setDirection(CarouselParams.RIGHT)        //滚动方向，只能是LEFT或RIGHT,默认RIGHT
+        .setDirection(CarouselParams.LEFT)         //滚动方向，只能是LEFT或RIGHT,默认LEFT
         .setInterpolator(DecelerateInterpolator()) //滚动插值器，默认DecelerateInterpolator
-        .setInterval(5000L)                        //滚动间隔，默认5s
+        .setInterval(5000L)                        //滚动间隔millisecond，默认5s
+        .setScrollDuration(2000)                   //单张滚动时长millisecond，默认1s
         .setPauseWhenTouch(true)                   //手指按下时是否滚动，默认true
         .setRecyclable(true)                       //循环滚动，默认true
         .setReversible(false)                      //反转滚动，默认false
-        .setScrollDuration(2000)                   //单张滚动时长，默认1s
         .enableCarousel(true)                      //是否支持轮播，默认true
         .setAutoCarousel(true)                     //自动开始/结束轮播，默认true
+        .setScrollWhenOne(false)                   //只有一张图时仍然滚动,默认false
+        .setScrollAble(true)                       //是否支持手动滑动，默认true(慎用)。设置为false后子view不会响应触摸事件
         .build()
-  params.onParamsChanged()                         //支持动态设置参数，设置后调用改方法使其生效
+  adapter.params = params                          //支持动态设置参数
+  adapter.notifyDataSetChanged()                   //设置参数后需主动调用该方法使其生效
 ```
 ##### 三、设置ViewPager
 
 ```
   viewPager.adapter = Your adapter
-  val carouselViewPager = CarouselViewPager(viewPager, params) //绑定viewpager，params可选
+  val carouselViewPager = CarouselViewPager(viewPager, params) //绑定viewpager（params可选）
   //在适当的时候开始/停止轮播（可选）
   carouselViewPager.onStart()  //开始轮播
   carouselViewPager.onStop()   //停止轮播
+  //设置指示器CarouselIndicator（可选）
+  indicator.setupViewPager(viewPager) //必须在viewPager设置adapter后调用
+
   //TODO 为adapter设置数据
 ```
 
-##### 四、设置生命周期（可选）
+##### 四、设置Banner的生命周期（可选）
 
 1、在activity或fragment的适当时机，如onStart的时候调用viewpager.onStart
 
 2、在activity或fragment的适当时机，如onStop的时候调用viewpager.onStop
 
 **注:** 若params.autoCarousel为true时，且viewPager.context为AppCompatActivity的实例，则自动跟随activity的onStart/onStop调用
+
+
+##### 五、配置指示器CarouselIndicator(可选)
+```
+  <com.eye.cool.banner.CarouselIndicator
+    android:id="@+id/indicator"
+    android:layout_width="wrap_content"
+    android:layout_height="48dp"
+    app:animator="reference"
+    app:animator_reverse="reference"
+    app:width="dimension"
+    app:height="dimension"
+    app:margin="dimension"
+    app:drawable="reference"
+    app:drawable_unselected="reference"
+    app:orientation="horizontal|vertical"
+    app:ci_gravity="同LinearLayout"/>
+```
+
+[![](https://jitpack.io/v/wshychbydh/banner.svg)](https://jitpack.io/#wshychbydh/banner)

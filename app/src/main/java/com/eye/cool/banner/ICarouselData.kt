@@ -13,10 +13,8 @@ interface ICarouselData<T> : ICarousel {
 
   override fun getInitItem(): Int {
     val size = getDataSize()
-    if (!params.recyclable) return 0
-    if (params.recyclable) return 0
     val half = Int.MAX_VALUE / 2
-    return if (size > 1) {
+    return if (size > 0) {
       half - half % size
     } else 0
   }
@@ -33,24 +31,17 @@ interface ICarouselData<T> : ICarousel {
   }
 
   override fun getCount(): Int {
-    val count = getDataSize()
-    if (count <= 1) {
-      return count
-    }
-    if (!params.recyclable) return count
-    if (params.recyclable) return count
     return Integer.MAX_VALUE
   }
 
   override fun getNextPage(currentPage: Int): Int {
     if (!params.recyclable && !params.reversible) return currentPage
     val size = getDataSize()
-    if (size == 1) return currentPage
     if (params.reversible) {
-      if (params.direction == CarouselParams.RIGHT) {
+      if (params.direction == CarouselParams.LEFT) {
         val next = currentPage + 1
         return if (next % size == 0) {
-          params.direction = CarouselParams.LEFT
+          params.direction = CarouselParams.RIGHT
           currentPage - 1
         } else {
           next
@@ -58,7 +49,7 @@ interface ICarouselData<T> : ICarousel {
       } else {
         val next = currentPage - 1
         return if (next % size <= 0) {
-          params.direction = CarouselParams.RIGHT
+          params.direction = CarouselParams.LEFT
           currentPage + 1
         } else {
           next
@@ -66,7 +57,7 @@ interface ICarouselData<T> : ICarousel {
       }
     }
     if (params.recyclable) {
-      return if (params.direction == CarouselParams.RIGHT) currentPage + 1 else currentPage - 1
+      return if (params.direction == CarouselParams.LEFT) currentPage + 1 else currentPage - 1
     }
     return currentPage
   }

@@ -143,7 +143,7 @@ class CarouselIndicator : LinearLayout {
     return animatorIn
   }
 
-  fun setViewPager(viewPager: ViewPager) {
+  fun setupViewPager(viewPager: ViewPager) {
     this.viewPager = viewPager
     if (viewPager.adapter != null) {
       if (viewPager.adapter!!.count > 1) {
@@ -155,7 +155,6 @@ class CarouselIndicator : LinearLayout {
       viewPager.addOnPageChangeListener(internalPageChangeListener)
       viewPager.adapter!!.registerDataSetObserver(dataSetObserver)
     }
-
   }
 
   private fun createIndicators(currentItem: Int, indicatorCount: Int) {

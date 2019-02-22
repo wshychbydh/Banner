@@ -10,23 +10,22 @@ class CarouselParams private constructor() {
   internal var reversible = false  //轮播到最后一张后反向滑动
   internal var recyclable = true   //循环
   internal var pauseWhenTouch = true  //按下时不滑动
-  internal var canFlashback = true  //在第一个位置时是否也可反向滑动(保留)
   internal var scrollDuration = 1000 //viewpager 切换速度
-  internal var direction = RIGHT //轮播方向
+  internal var direction = LEFT //轮播方向
   internal var carouselAble = true // 是否支持轮播
   internal var autoCarousel = true // 自动轮播
+  internal var scrollWhenOne = false // 只有一张图时仍然滚动
   internal var interpolator: Interpolator? = null //插入器
-
-  private val observers = mutableListOf<ParamsObserver>()
+  internal var scrollAble = true  //是否可以手动滑动
 
   class Builder {
     private val params = CarouselParams()
 
     /**
-     * 切换间隔时间，默认5s
+     * 切换间隔时间，默认5s,单位毫秒
      */
-    fun setInterval(interval: Long): Builder {
-      params.interval = interval
+    fun setInterval(millisecond: Long): Builder {
+      params.interval = millisecond
       return this
     }
 
@@ -55,10 +54,10 @@ class CarouselParams private constructor() {
     }
 
     /**
-     * 单张图片轮播的时长,默认1s
+     * 单张图片轮播的时长,默认1s,单位毫秒
      */
-    fun setScrollDuration(scrollDuration: Int): Builder {
-      params.scrollDuration = scrollDuration
+    fun setScrollDuration(millisecond: Int): Builder {
+      params.scrollDuration = millisecond
       return this
     }
 
@@ -67,6 +66,23 @@ class CarouselParams private constructor() {
      */
     fun setDirection(direction: Int): Builder {
       params.direction = direction
+      return this
+    }
+
+    /**
+     * 只有一张图时仍然滚动,默认false
+     */
+    fun setScrollWhenOne(scrollWhenOne: Boolean): Builder {
+      params.scrollWhenOne = scrollWhenOne
+      return this
+    }
+
+    /**
+     * 是否支持手动滑动，默认true(慎用)。设置为false后子view不会响应触摸事件
+     * 但是viewPager仍然可以响应onClick(400ms)事情
+     */
+    fun setScrollAble(scrollAble: Boolean): Builder {
+      params.scrollAble = scrollAble
       return this
     }
 
@@ -95,43 +111,13 @@ class CarouselParams private constructor() {
       return this
     }
 
-    /**
-     * 暂保留
-     * 参数变动回调，需手动调用onParamsChanged后才会执行
-     */
-    private fun registerParamsObserver(observer: ParamsObserver): Builder {
-      if (!params.observers.contains(observer)) {
-        params.observers.add(observer)
-      }
-      return this
-    }
-
     fun build(): CarouselParams {
       return params
-    }
-  }
-
-  /**
-   * 参数变动回调，需手动调用onParamsChanged后才会执行
-   */
-  internal fun registerParamsObserver(observer: ParamsObserver) {
-    if (!observers.contains(observer)) {
-      observers.add(observer)
-    }
-  }
-
-  fun onParamsChanged() {
-    observers.forEach {
-      it.onParamsChanged()
     }
   }
 
   companion object {
     const val LEFT = 0  //向左轮播
     const val RIGHT = 1  //向右轮播
-  }
-
-  interface ParamsObserver {
-    fun onParamsChanged()
   }
 }
