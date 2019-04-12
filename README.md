@@ -21,11 +21,11 @@
 
 ### 使用方法：
 
-##### 一、使用CarouselViewPager实现自动无限轮播同使用ViewPager使用方式一样
+#### 一、使用CarouselViewPager实现自动无限轮播同使用ViewPager使用方式一样
 
-注：可能无法响应ViewPager的OnClick点击事件(通常也不会有此需求)
+**注:**可能无法正常响应该ViewPager的触摸事件(通常也不会有此需求), 但不会影响子View。
 
-##### 二、使用LoopViewPager实现无限轮播同使用ViewPager使用方式一样（不支持自动轮播）
+#### 二、使用LoopViewPager实现无限轮播同使用ViewPager使用方式一样（不支持自动轮播）
 
 1、调用setBoundaryCaching设置是否缓存边界，默认false
 ```
@@ -40,7 +40,7 @@
   LoopViewPager.toRealPosition(position, count)
 ```
 
-##### 三、构建CarouselViewPager的CarouselParams参数
+#### 三、构建CarouselViewPager的CarouselParams参数
 
 ```
   val params = CarouselParams.Builder()
@@ -62,7 +62,7 @@
   viewPager.params = params                        //支持动态设置参数(设置后自动生效)
 ```
 
-##### 四、设置CarouselViewPager的开启/关闭自动轮播（可选）
+#### 四、设置CarouselViewPager的开启/关闭自动轮播（可选）
 
 1、在activity或fragment或其他适当时机，调用viewpager.start()启动自动轮播
 
@@ -72,10 +72,11 @@
 
 4、若设置setAutoCarousel(false)，当adapter数据变化后轮播会停止，需再次调用start()开启轮播.
 
-**注:** 若params.autoCarousel为true时，当adapter有数据后会自动开始轮播； 若设置了params.attachLifecycle，则会自动跟随lifecycle的onStart/onStop自动调用
+**注:** 若params.autoCarousel为true时，当adapter有数据后会自动开始轮播；
+ 若设置了params.attachLifecycle，则会自动跟随lifecycle的onStart/onStop自动调用
 
 
-##### 五、配置指示器CarouselIndicator(可选)
+#### 五、配置指示器CarouselIndicator(可选)
 ```
   <com.eye.cool.banner.CarouselIndicator
     android:id="@+id/indicator"
