@@ -1,11 +1,11 @@
 # Banner
-快速构建轮播banner
+快速构建无限轮播banner
 
 ### 功能点：
 
 1、支持自定义轮播时长
 
-2、支持自定义切换插值器及时长
+2、支持自定义切换插值器及滚动时长
 
 3、支持反向轮播
 
@@ -13,66 +13,66 @@
 
 4、支持手指触摸后不进行轮播及禁用滑动开关
 
-5、支持自动伴随Activity的生命周期开始/结束轮播
+5、支持自动开始轮播和伴随Lifecycle的生命周期开始/结束轮播
 
-6、默认指示器
+6、支持定义指示器及自带默认指示器
 
 7、支持单张轮播开关
 
 ### 使用方法：
 
-##### 一、构建ViewPager的adapter（以下方式任选）
+##### 一、使用CarouselViewPager实现自动无限轮播同使用ViewPager使用方式一样
 
-1、你的adapter实现ICarousel或ICarouselData接口
+注：可能无法响应ViewPager的OnClick点击事件(通常也不会有此需求)
 
-2、你的adapter继承CarouselPagerAdapter **（推荐）**
+##### 二、使用LoopViewPager实现无限轮播同使用ViewPager使用方式一样（不支持自动轮播）
 
+1、调用setBoundaryCaching设置是否缓存边界，默认false
 ```
-    adapter.setData(T)     //设置数据
-    adapter.appendData(T)  //添加数据
-    adapter.getDataSize()  //获取内容的真实条数
+  viewPager.setBoundaryCaching(false)
+```
+2、调用setIndicator设置自定义指示器
+```
+  viewPager.setIndicator(null)
+```
+3、调用toRealPosition来获取真实的position
+```
+  LoopViewPager.toRealPosition(position, count)
 ```
 
-##### 二、构建ViewPager参数
+##### 三、构建CarouselViewPager的CarouselParams参数
 
 ```
   val params = CarouselParams.Builder()
         .setDirection(CarouselParams.LEFT)         //滚动方向，只能是LEFT或RIGHT,默认LEFT
-        .setInterpolator(DecelerateInterpolator()) //滚动插值器，默认DecelerateInterpolator
+        .setInterpolator(null)                     //滚动插值器，默认DecelerateInterpolator
         .setInterval(5000L)                        //滚动间隔millisecond，默认5s
-        .setScrollDuration(2000)                   //单张滚动时长millisecond，默认1s
+        .setScrollDuration(250)                    //单张滚动时长millisecond，默认250ms
         .setPauseWhenTouch(true)                   //手指按下时是否滚动，默认true
+        .enableCarousel(true)                      //是否支持轮播，默认true，（注：若设置为false，不会自动轮播）
         .setRecyclable(true)                       //循环滚动，默认true
         .setReversible(false)                      //反转滚动，默认false
-        .enableCarousel(true)                      //是否支持轮播，默认true
-        .setAutoCarousel(true)                     //自动开始/结束轮播，默认true
+        .setAutoCarousel(true)                     //自动开始/结束轮播，默认true，(注：若为false，数据改变后不会继续轮播）
         .setScrollWhenOne(false)                   //只有一张图时仍然滚动,默认false
-        .setScrollAble(true)                       //是否支持手动滑动，默认true(慎用)。设置为false后子view不会响应触摸事件
+        .setScrollAble(true)                       //是否支持手动滑动，默认true
+        .setAttachLifecycle(null)                  //开始/结束伴随生命周期
+        .setCacheBoundary(false)                   //是否缓存边界View，默认false
+        .setIndicator(null)                        //自定义指示器
         .build()
-  adapter.params = params                          //支持动态设置参数
-  adapter.notifyDataSetChanged()                   //设置参数后需主动调用该方法使其生效
-```
-##### 三、设置ViewPager
-
-```
-  viewPager.adapter = Your adapter
-  val carouselViewPager = CarouselViewPager(viewPager, params) //绑定viewpager（params可选）
-  //在适当的时候开始/停止轮播（可选）
-  carouselViewPager.onStart()  //开始轮播
-  carouselViewPager.onStop()   //停止轮播
-  //设置指示器CarouselIndicator（可选）
-  indicator.setupViewPager(viewPager) //必须在viewPager设置adapter后调用
-
-  //TODO 为adapter设置数据
+  viewPager.params = params                        //支持动态设置参数(设置后自动生效)
 ```
 
-##### 四、设置Banner的生命周期（可选）
+##### 四、设置CarouselViewPager的开启/关闭自动轮播（可选）
 
-1、在activity或fragment的适当时机，如onStart的时候调用viewpager.onStart
+1、在activity或fragment或其他适当时机，调用viewpager.start()启动自动轮播
 
-2、在activity或fragment的适当时机，如onStop的时候调用viewpager.onStop
+2、在activity或fragment或其他适当时机，调用viewpager.stop()关闭自动轮播
 
-**注:** 若params.autoCarousel为true时，且viewPager.context为AppCompatActivity的实例，则自动跟随activity的onStart/onStop调用
+3、若设置enableCarousel(false)，无论如何都不会自动轮播
+
+4、若设置setAutoCarousel(false)，当adapter数据变化后轮播会停止，需再次调用start()开启轮播.
+
+**注:** 若params.autoCarousel为true时，当adapter有数据后会自动开始轮播； 若设置了params.attachLifecycle，则会自动跟随lifecycle的onStart/onStop自动调用
 
 
 ##### 五、配置指示器CarouselIndicator(可选)
@@ -87,6 +87,7 @@
     app:height="dimension"
     app:margin="dimension"
     app:drawable="reference"
+    app:alwaysShownOnOnlyOne="boolean"
     app:drawable_unselected="reference"
     app:orientation="horizontal|vertical"
     app:ci_gravity="同LinearLayout"/>

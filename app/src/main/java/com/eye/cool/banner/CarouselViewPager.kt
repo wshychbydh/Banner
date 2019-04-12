@@ -104,29 +104,35 @@ class CarouselViewPager(context: Context, attrs: AttributeSet?)
   @OnLifecycleEvent(Lifecycle.Event.ON_RESUME)
   private fun onStart() {
     if (params.autoCarousel) {
-      val count = adapter?.count ?: 0
-      if (count <= 0 || (count == 1 && !params.scrollWhenOne)) return
-      removeCallbacks(this)
-      postDelayed(this, params.interval)
+      carousel()
     }
+  }
+
+  private fun carousel() {
+    if (!params.carouselAble) return
+    val count = adapter?.count ?: 0
+    if (count <= 0 || (count == 1 && !params.scrollWhenOne)) return
+    removeCallbacks(this)
+    postDelayed(this, params.interval)
   }
 
   /**
-   * Call
+   * Start round
    */
   fun start() {
-    if (params.carouselAble) {
-      onStart()
-    }
+    carousel()
   }
 
+  /**
+   * Stop round
+   */
   fun stop() {
     onStop()
   }
 
   private fun restart() {
-    stop()
-    start()
+    onStop()
+    onStart()
   }
 
   /**

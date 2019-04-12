@@ -3,7 +3,7 @@ package com.eye.cool.banner
 /**
  * Created by cool on 2018/4/18.
  */
-interface ICarousel {
+internal interface ICarousel {
 
   fun getCount(): Int
 

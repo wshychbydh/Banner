@@ -8,14 +8,14 @@ import android.view.animation.Interpolator
  */
 class CarouselParams private constructor() {
   internal var interval: Long = 5000L
-  internal var reversible = true
+  internal var reversible = false
   internal var recyclable = true
   internal var pauseWhenTouch = true
   internal var scrollDuration: Int? = null
   internal var direction = LEFT
   internal var carouselAble = true
   internal var autoCarousel = true
-  internal var scrollWhenOne = true
+  internal var scrollWhenOne = false
   internal var interpolator: Interpolator? = null
   internal var scrollAble = true
   internal var attachLifecycle: Lifecycle? = null
@@ -90,7 +90,7 @@ class CarouselParams private constructor() {
     }
 
     /**
-     * Support to round, default true
+     * Support to round, default true。If set false, it will never auto-rotation.
      */
     fun enableCarousel(enable: Boolean): Builder {
       params.carouselAble = enable
