@@ -21,11 +21,28 @@
 
 ### 使用方法：
 
-#### 一、使用CarouselViewPager实现自动无限轮播同使用ViewPager使用方式一样
+#### 一、添加依赖
+###### 1、在root目录的build.gradle中添加
+```
+    allprojects {
+        repositories {
+            ...
+            maven { url 'https://jitpack.io' }
+        }
+    }
+```
+###### 2、在项目的build.gradle中添加依赖
+```
+    dependencies {
+        implementation 'com.github.wshychbydh:banner:1.1.1'
+    }
+```
+
+#### 二、使用CarouselViewPager实现自动无限轮播同使用ViewPager使用方式一样
 
 **注:** 可能无法正常响应该ViewPager的触摸事件(通常也不会有此需求), 但不会影响子View。
 
-#### 二、使用LoopViewPager实现无限轮播同使用ViewPager使用方式一样（不支持自动轮播）
+#### 三、或使用LoopViewPager实现无限轮播同使用ViewPager使用方式一样（不支持自动轮播）
 
 1、调用setBoundaryCaching设置是否缓存边界，默认false
 ```
@@ -40,7 +57,7 @@
   LoopViewPager.toRealPosition(position, count)
 ```
 
-#### 三、构建CarouselViewPager的CarouselParams参数
+#### 四、构建CarouselViewPager的CarouselParams参数
 
 ```
   val params = CarouselParams.Builder()
@@ -62,7 +79,7 @@
   viewPager.params = params                        //支持动态设置参数(设置后自动生效)
 ```
 
-#### 四、设置CarouselViewPager的开启/关闭自动轮播（可选）
+#### 五、设置CarouselViewPager的开启/关闭自动轮播（可选）
 
 1、在activity或fragment或其他适当时机，调用viewpager.start()启动自动轮播
 
@@ -76,7 +93,7 @@
  若设置了params.attachLifecycle，则会自动跟随lifecycle的onStart/onStop自动调用
 
 
-#### 五、配置指示器CarouselIndicator(可选)
+#### 六、配置指示器CarouselIndicator(可选)
 ```
   <com.eye.cool.banner.CarouselIndicator
     android:id="@+id/indicator"
