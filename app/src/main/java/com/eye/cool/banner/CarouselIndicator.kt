@@ -2,14 +2,9 @@ package com.eye.cool.banner
 
 import android.animation.Animator
 import android.animation.AnimatorInflater
-import android.annotation.TargetApi
 import android.content.Context
-import android.database.DataSetObserver
-import android.os.Build
 import android.support.annotation.AnimatorRes
 import android.support.annotation.DrawableRes
-import android.support.v4.view.ViewPager
-import android.support.v4.view.ViewPager.OnPageChangeListener
 import android.util.AttributeSet
 import android.view.Gravity
 import android.view.View
@@ -18,12 +13,14 @@ import android.widget.LinearLayout
 
 /**
  * Created by cool on 2018/4/18.
+ * More see https://github.com/JakeWharton/ViewPagerIndicator
  */
-class CarouselIndicator : LinearLayout {
-  private var viewPager: ViewPager? = null
-  private var indicatorMargin = -1
-  private var indicatorWidth = -1
-  private var indicatorHeight = -1
+class CarouselIndicator @JvmOverloads constructor(
+    context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
+) : LinearLayout(context, attrs, defStyleAttr), IIndicator {
+  private var indicatorMargin = 0
+  private var indicatorWidth = 0
+  private var indicatorHeight = 0
   private var animatorResId = R.animator.scale_with_alpha
   private var animatorReverseResId = 0
   private var indicatorBackgroundResId = R.drawable.white_radius
@@ -32,32 +29,24 @@ class CarouselIndicator : LinearLayout {
   private var animatorIn: Animator? = null
   private var immediateAnimatorOut: Animator? = null
   private var immediateAnimatorIn: Animator? = null
-  var replaceView: View? = null
+  private var placeHolderView: View? = null
+  private var alwaysShownOnOnlyOne = true
 
   private var lastPosition = -1
 
-  constructor(context: Context) : super(context) {
-    init(context, null)
-  }
-
-  constructor(context: Context, attrs: AttributeSet) : super(context, attrs) {
+  init {
     init(context, attrs)
   }
 
-  constructor(context: Context, attrs: AttributeSet, defStyleAttr: Int) : super(context, attrs, defStyleAttr) {
-    init(context, attrs)
-  }
-
-  @TargetApi(Build.VERSION_CODES.LOLLIPOP)
-  constructor(context: Context, attrs: AttributeSet, defStyleAttr: Int, defStyleRes: Int) : super(context, attrs, defStyleAttr, defStyleRes) {
-    init(context, attrs)
-  }
-
-  @JvmOverloads
-  fun configureIndicator(indicatorWidth: Int, indicatorHeight: Int, indicatorMargin: Int,
-                         @AnimatorRes animatorId: Int = R.animator.scale_with_alpha, @AnimatorRes animatorReverseId: Int = 0,
-                         @DrawableRes indicatorBackgroundId: Int = R.drawable.white_radius,
-                         @DrawableRes indicatorUnselectedBackgroundId: Int = R.drawable.white_radius) {
+  fun configureIndicator(
+      indicatorWidth: Int = 0,
+      indicatorHeight: Int = 0,
+      indicatorMargin: Int = 0,
+      @AnimatorRes animatorId: Int = R.animator.scale_with_alpha,
+      @AnimatorRes animatorReverseId: Int = 0,
+      @DrawableRes indicatorBackgroundId: Int = R.drawable.white_radius,
+      @DrawableRes indicatorUnselectedBackgroundId: Int = R.drawable.white_radius
+  ) {
 
     this.indicatorWidth = indicatorWidth
     this.indicatorHeight = indicatorHeight
@@ -82,31 +71,29 @@ class CarouselIndicator : LinearLayout {
     }
 
     val typedArray = context.obtainStyledAttributes(attrs, R.styleable.CarouselIndicator)
-    indicatorWidth = typedArray.getDimensionPixelSize(R.styleable.CarouselIndicator_width, -1)
-    indicatorHeight = typedArray.getDimensionPixelSize(R.styleable.CarouselIndicator_height, -1)
-    indicatorMargin = typedArray.getDimensionPixelSize(R.styleable.CarouselIndicator_margin, -1)
+    indicatorWidth = typedArray.getDimensionPixelSize(R.styleable.CarouselIndicator_width, 0)
+    indicatorHeight = typedArray.getDimensionPixelSize(R.styleable.CarouselIndicator_height, 0)
+    indicatorMargin = typedArray.getDimensionPixelSize(R.styleable.CarouselIndicator_margin, 0)
 
-    animatorResId = typedArray.getResourceId(R.styleable.CarouselIndicator_animator,
-        R.animator.scale_with_alpha)
+    animatorResId = typedArray.getResourceId(R.styleable.CarouselIndicator_animator, R.animator.scale_with_alpha)
     animatorReverseResId = typedArray.getResourceId(R.styleable.CarouselIndicator_animator_reverse, 0)
-    indicatorBackgroundResId = typedArray.getResourceId(R.styleable.CarouselIndicator_drawable,
-        R.drawable.white_radius)
-    indicatorUnselectedBackgroundResId = typedArray.getResourceId(R.styleable.CarouselIndicator_drawable_unselected,
-        indicatorBackgroundResId)
+    indicatorBackgroundResId = typedArray.getResourceId(R.styleable.CarouselIndicator_drawable, R.drawable.white_radius)
+    indicatorUnselectedBackgroundResId = typedArray.getResourceId(R.styleable.CarouselIndicator_drawable_unselected, indicatorBackgroundResId)
 
-    val orientation = typedArray.getInt(R.styleable.CarouselIndicator_orientation, -1)
+    val orientation = typedArray.getInt(R.styleable.CarouselIndicator_orientation, LinearLayout.HORIZONTAL)
     setOrientation(if (orientation == LinearLayout.VERTICAL) LinearLayout.VERTICAL else LinearLayout.HORIZONTAL)
 
-    val gravity = typedArray.getInt(R.styleable.CarouselIndicator_ci_gravity, -1)
+    val gravity = typedArray.getInt(R.styleable.CarouselIndicator_ci_gravity, Gravity.CENTER)
     setGravity(if (gravity >= 0) gravity else Gravity.CENTER)
 
+    alwaysShownOnOnlyOne = typedArray.getBoolean(R.styleable.CarouselIndicator_alwaysShownOnOnlyOne, true)
     typedArray.recycle()
   }
 
   private fun checkIndicatorConfig(context: Context) {
-    indicatorWidth = if (indicatorWidth < 0) dip2px(DEFAULT_INDICATOR_WIDTH.toFloat()) else indicatorWidth
-    indicatorHeight = if (indicatorHeight < 0) dip2px(DEFAULT_INDICATOR_WIDTH.toFloat()) else indicatorHeight
-    indicatorMargin = if (indicatorMargin < 0) dip2px(DEFAULT_INDICATOR_WIDTH.toFloat()) else indicatorMargin
+    indicatorWidth = if (indicatorWidth <= 0) dip2px(DEFAULT_INDICATOR_WIDTH.toFloat()) else indicatorWidth
+    indicatorHeight = if (indicatorHeight <= 0) dip2px(DEFAULT_INDICATOR_WIDTH.toFloat()) else indicatorHeight
+    indicatorMargin = if (indicatorMargin <= 0) dip2px(DEFAULT_INDICATOR_WIDTH.toFloat()) else indicatorMargin
 
     animatorResId = if (animatorResId == 0) R.animator.scale_with_alpha else animatorResId
 
@@ -118,14 +105,28 @@ class CarouselIndicator : LinearLayout {
     immediateAnimatorIn = createAnimatorIn(context)
     immediateAnimatorIn!!.duration = 0
 
-    indicatorBackgroundResId = if (indicatorBackgroundResId == 0)
-      R.drawable.white_radius
-    else
-      indicatorBackgroundResId
-    indicatorUnselectedBackgroundResId = if (indicatorUnselectedBackgroundResId == 0)
-      indicatorBackgroundResId
-    else
-      indicatorUnselectedBackgroundResId
+    indicatorBackgroundResId = if (indicatorBackgroundResId == 0) R.drawable.white_radius else indicatorBackgroundResId
+    indicatorUnselectedBackgroundResId = if (indicatorUnselectedBackgroundResId == 0) indicatorBackgroundResId else indicatorUnselectedBackgroundResId
+  }
+
+  override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
+    super.onMeasure(widthMeasureSpec, heightMeasureSpec)
+    val minHeight = Math.max(indicatorHeight * 2, measuredHeight)
+    setMeasuredDimension(measuredWidth, minHeight)
+  }
+
+  /**
+   * When the last item is selected, the placeholder will displayed
+   */
+  fun setPlaceHolderView(placeholder: View) {
+    this.placeHolderView = placeholder
+  }
+
+  /**
+   * Show indicator even if only one item
+   */
+  fun setAlwaysShownOnOnlyOne(shown: Boolean) {
+    this.alwaysShownOnOnlyOne = shown
   }
 
   private fun createAnimatorOut(context: Context): Animator {
@@ -143,31 +144,13 @@ class CarouselIndicator : LinearLayout {
     return animatorIn
   }
 
-  fun setupViewPager(viewPager: ViewPager) {
-    this.viewPager = viewPager
-    if (viewPager.adapter != null) {
-      if (viewPager.adapter!!.count > 1) {
-        val currentItem = getCurrentItem()
-        lastPosition = -1
-        createIndicators(currentItem, getDataCount())
-        internalPageChangeListener.onPageSelected(currentItem)
-      }
-      viewPager.addOnPageChangeListener(internalPageChangeListener)
-      viewPager.adapter!!.registerDataSetObserver(dataSetObserver)
-    }
-  }
-
   private fun createIndicators(currentItem: Int, indicatorCount: Int) {
-    removeAllViews()
-    if (indicatorCount > 1) {
-      val orientation = orientation
-      for (i in 0 until indicatorCount) {
-        if (currentItem == i) {
-          addIndicator(orientation, indicatorBackgroundResId, immediateAnimatorOut)
-        } else {
-          addIndicator(orientation, indicatorUnselectedBackgroundResId,
-              immediateAnimatorIn)
-        }
+    val orientation = orientation
+    for (i in 0 until indicatorCount) {
+      if (currentItem == i) {
+        addIndicator(orientation, indicatorBackgroundResId, immediateAnimatorOut)
+      } else {
+        addIndicator(orientation, indicatorUnselectedBackgroundResId, immediateAnimatorIn)
       }
     }
   }
@@ -209,92 +192,62 @@ class CarouselIndicator : LinearLayout {
     return (dpValue * scale + 0.5f).toInt()
   }
 
-  companion object {
-
-    private const val DEFAULT_INDICATOR_WIDTH = 5
-  }
-
-  private val internalPageChangeListener = object : OnPageChangeListener {
-
-    override fun onPageScrolled(position: Int, positionOffset: Float, positionOffsetPixels: Int) {}
-
-    override fun onPageSelected(position: Int) {
-
-      val indicatorCount = getDataCount()
-
-      if (indicatorCount <= 0) return
-
-      val indicatorPosition = position % indicatorCount
-
-      if (replaceView != null && indicatorPosition == indicatorCount - 1) {
-        replaceView!!.visibility = View.VISIBLE
-        visibility = View.GONE
-      } else {
-        if (replaceView != null) {
-          replaceView!!.visibility = View.GONE
-        }
-        visibility = View.VISIBLE
-      }
-
-      if (animatorIn!!.isRunning) {
-        animatorIn!!.end()
-        animatorIn!!.cancel()
-      }
-
-      if (animatorOut!!.isRunning) {
-        animatorOut!!.end()
-        animatorOut!!.cancel()
-      }
-
-      if (lastPosition >= 0 && getChildAt(lastPosition) != null) {
-        val currentIndicator = getChildAt(lastPosition)
-        currentIndicator.setBackgroundResource(indicatorUnselectedBackgroundResId)
-        animatorIn!!.setTarget(currentIndicator)
-        animatorIn!!.start()
-      }
-
-      val selectedIndicator = getChildAt(indicatorPosition)
-      if (selectedIndicator != null) {
-        selectedIndicator.setBackgroundResource(indicatorBackgroundResId)
-        animatorOut!!.setTarget(selectedIndicator)
-        animatorOut!!.start()
-      }
-      lastPosition = indicatorPosition
-    }
-
-    override fun onPageScrollStateChanged(state: Int) {}
-  }
-
-  private val dataSetObserver: DataSetObserver = object : DataSetObserver() {
-    override fun onChanged() {
-      super.onChanged()
-      val newCount = getDataCount()
+  override fun onDataChanged(currentPosition: Int, count: Int) {
+    removeAllViews()
+    visibility = View.GONE
+    if (count > 0 && (alwaysShownOnOnlyOne || count > 1)) {
       val currentCount = childCount
-      val currentItem = viewPager!!.currentItem % newCount
-
+      val currentItem = currentPosition % count
       lastPosition = when {
-        newCount == currentCount -> return
-        lastPosition < newCount -> currentItem
+        count == currentCount -> return
+        lastPosition < count -> currentPosition
         else -> -1
       }
-
-      createIndicators(currentItem, newCount)
+      createIndicators(currentItem, count)
+      visibility = View.VISIBLE
     }
   }
 
-  private fun getCurrentItem(): Int {
-    val dataCount = getDataCount()
-    return if (dataCount > 0) {
-      viewPager!!.currentItem % dataCount
-    } else 0
-  }
+  override fun onPageSelected(position: Int) {
+    if (childCount == 0) return
 
-  private fun getDataCount(): Int {
-    return if (viewPager!!.adapter is ICarousel) {
-      val iCarousel = viewPager!!.adapter as ICarousel
-      iCarousel.getDataSize()
+    val indicatorPosition = position % childCount
+
+    if (placeHolderView != null && indicatorPosition == childCount - 1) {
+      placeHolderView!!.visibility = View.VISIBLE
+      visibility = View.GONE
     } else {
-      viewPager!!.adapter!!.count
+      placeHolderView?.visibility = View.GONE
+      visibility = View.VISIBLE
     }
+
+    if (animatorIn!!.isRunning) {
+      animatorIn!!.end()
+      animatorIn!!.cancel()
+    }
+
+    if (animatorOut!!.isRunning) {
+      animatorOut!!.end()
+      animatorOut!!.cancel()
+    }
+
+    if (lastPosition >= 0 && getChildAt(lastPosition) != null) {
+      val currentIndicator = getChildAt(lastPosition)
+      currentIndicator.setBackgroundResource(indicatorUnselectedBackgroundResId)
+      animatorIn!!.setTarget(currentIndicator)
+      animatorIn!!.start()
+    }
+
+    val selectedIndicator = getChildAt(indicatorPosition)
+    if (selectedIndicator != null) {
+      selectedIndicator.setBackgroundResource(indicatorBackgroundResId)
+      animatorOut!!.setTarget(selectedIndicator)
+      animatorOut!!.start()
+    }
+    lastPosition = indicatorPosition
+  }
+
+  companion object {
+    private const val DEFAULT_INDICATOR_WIDTH = 8
   }
 }
