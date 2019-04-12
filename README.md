@@ -23,7 +23,7 @@
 
 #### 一、使用CarouselViewPager实现自动无限轮播同使用ViewPager使用方式一样
 
-**注:**可能无法正常响应该ViewPager的触摸事件(通常也不会有此需求), 但不会影响子View。
+**注:** 可能无法正常响应该ViewPager的触摸事件(通常也不会有此需求), 但不会影响子View。
 
 #### 二、使用LoopViewPager实现无限轮播同使用ViewPager使用方式一样（不支持自动轮播）
 
