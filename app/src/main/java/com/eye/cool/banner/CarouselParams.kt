@@ -1,7 +1,7 @@
 package com.eye.cool.banner
 
-import android.arch.lifecycle.Lifecycle
 import android.view.animation.Interpolator
+import androidx.lifecycle.Lifecycle
 
 /**
  *Created by ycb on 2019/2/20 0020

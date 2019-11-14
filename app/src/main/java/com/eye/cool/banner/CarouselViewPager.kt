@@ -1,16 +1,15 @@
 package com.eye.cool.banner
 
-import android.annotation.SuppressLint
-import android.arch.lifecycle.Lifecycle
-import android.arch.lifecycle.LifecycleObserver
-import android.arch.lifecycle.OnLifecycleEvent
 import android.content.Context
 import android.database.DataSetObserver
-import android.support.v4.view.PagerAdapter
-import android.support.v4.view.ViewPager
 import android.util.AttributeSet
 import android.view.MotionEvent
 import android.widget.Scroller
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleObserver
+import androidx.lifecycle.OnLifecycleEvent
+import androidx.viewpager.widget.PagerAdapter
+import androidx.viewpager.widget.ViewPager
 
 
 /**
@@ -73,11 +72,11 @@ class CarouselViewPager(context: Context, attrs: AttributeSet?)
     } else false
   }
 
-  @SuppressLint("ClickableViewAccessibility")
   override fun onTouchEvent(ev: MotionEvent?): Boolean {
     return if (params.scrollAble) {
-      super.onTouchEvent(ev)
-    } else true
+      val count = adapter?.count ?: 0
+      if (!params.scrollWhenOne && count == 1) false else super.onTouchEvent(ev)
+    } else false
   }
 
   override fun run() {

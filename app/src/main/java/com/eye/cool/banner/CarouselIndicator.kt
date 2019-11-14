@@ -3,13 +3,13 @@ package com.eye.cool.banner
 import android.animation.Animator
 import android.animation.AnimatorInflater
 import android.content.Context
-import android.support.annotation.AnimatorRes
-import android.support.annotation.DrawableRes
 import android.util.AttributeSet
 import android.view.Gravity
 import android.view.View
 import android.view.animation.Interpolator
 import android.widget.LinearLayout
+import androidx.annotation.AnimatorRes
+import androidx.annotation.DrawableRes
 
 /**
  * Created by cool on 2018/4/18.
@@ -29,8 +29,8 @@ class CarouselIndicator @JvmOverloads constructor(
   private var animatorIn: Animator? = null
   private var immediateAnimatorOut: Animator? = null
   private var immediateAnimatorIn: Animator? = null
-  private var placeHolderView: View? = null
-  private var alwaysShownOnOnlyOne = true
+  private var placeholder: View? = null
+  private var alwaysShownWhenOne = true
 
   private var lastPosition = -1
 
@@ -80,13 +80,13 @@ class CarouselIndicator @JvmOverloads constructor(
     indicatorBackgroundResId = typedArray.getResourceId(R.styleable.CarouselIndicator_drawable, R.drawable.white_radius)
     indicatorUnselectedBackgroundResId = typedArray.getResourceId(R.styleable.CarouselIndicator_drawable_unselected, indicatorBackgroundResId)
 
-    val orientation = typedArray.getInt(R.styleable.CarouselIndicator_orientation, LinearLayout.HORIZONTAL)
-    setOrientation(if (orientation == LinearLayout.VERTICAL) LinearLayout.VERTICAL else LinearLayout.HORIZONTAL)
+    val orientation = typedArray.getInt(R.styleable.CarouselIndicator_orientation, HORIZONTAL)
+    setOrientation(if (orientation == VERTICAL) VERTICAL else HORIZONTAL)
 
     val gravity = typedArray.getInt(R.styleable.CarouselIndicator_ci_gravity, Gravity.CENTER)
     setGravity(if (gravity >= 0) gravity else Gravity.CENTER)
 
-    alwaysShownOnOnlyOne = typedArray.getBoolean(R.styleable.CarouselIndicator_alwaysShownOnOnlyOne, true)
+    alwaysShownWhenOne = typedArray.getBoolean(R.styleable.CarouselIndicator_alwaysShownWhenOne, true)
     typedArray.recycle()
   }
 
@@ -118,15 +118,17 @@ class CarouselIndicator @JvmOverloads constructor(
   /**
    * When the last item is selected, the placeholder will displayed
    */
-  fun setPlaceHolderView(placeholder: View) {
-    this.placeHolderView = placeholder
+  fun placeholder(placeholder: View): CarouselIndicator {
+    this.placeholder = placeholder
+    return this
   }
 
   /**
    * Show indicator even if only one item
    */
-  fun setAlwaysShownOnOnlyOne(shown: Boolean) {
-    this.alwaysShownOnOnlyOne = shown
+  fun alwaysShownWhenOnlyOne(alwaysShownWhenOne: Boolean): CarouselIndicator {
+    this.alwaysShownWhenOne = alwaysShownWhenOne
+    return this
   }
 
   private fun createAnimatorOut(context: Context): Animator {
@@ -167,7 +169,7 @@ class CarouselIndicator @JvmOverloads constructor(
     addView(indicatorView, indicatorWidth, indicatorHeight)
     val lp = indicatorView.layoutParams as LinearLayout.LayoutParams
 
-    if (orientation == LinearLayout.HORIZONTAL) {
+    if (orientation == HORIZONTAL) {
       lp.leftMargin = indicatorMargin
       lp.rightMargin = indicatorMargin
     } else {
@@ -195,7 +197,7 @@ class CarouselIndicator @JvmOverloads constructor(
   override fun onDataChanged(currentPosition: Int, count: Int) {
     removeAllViews()
     visibility = View.GONE
-    if (count > 0 && (alwaysShownOnOnlyOne || count > 1)) {
+    if (count > 0 && (alwaysShownWhenOne || count > 1)) {
       val currentCount = childCount
       val currentItem = currentPosition % count
       lastPosition = when {
@@ -213,11 +215,11 @@ class CarouselIndicator @JvmOverloads constructor(
 
     val indicatorPosition = position % childCount
 
-    if (placeHolderView != null && indicatorPosition == childCount - 1) {
-      placeHolderView!!.visibility = View.VISIBLE
+    if (placeholder != null && indicatorPosition == childCount - 1) {
+      placeholder!!.visibility = View.VISIBLE
       visibility = View.GONE
     } else {
-      placeHolderView?.visibility = View.GONE
+      placeholder?.visibility = View.GONE
       visibility = View.VISIBLE
     }
 

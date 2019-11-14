@@ -8,7 +8,7 @@
     <attr format="reference" name="animator_reverse"/>
     <attr format="reference" name="drawable"/>
     <attr format="reference" name="drawable_unselected"/>
-    <attr format="boolean" name="alwaysShownOnOnlyOne"/>
+    <attr format="boolean" name="alwaysShownWhenOne"/>
 
     <attr format="enum" name="orientation">
       <!-- Defines an horizontal widget. -->

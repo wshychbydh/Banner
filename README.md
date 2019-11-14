@@ -70,8 +70,8 @@
         .setRecyclable(true)                       //循环滚动，默认true
         .setReversible(false)                      //反转滚动，默认false
         .setAutoCarousel(true)                     //自动开始/结束轮播，默认true，(注：若为false，数据改变后不会继续轮播）
-        .setScrollWhenOne(false)                   //只有一张图时仍然滚动,默认false
-        .setScrollAble(true)                       //是否支持手动滑动，默认true
+        .setScrollWhenOne(false)                   //只有一张图时仍然滚动,默认false，禁用后，只有一个child时无法响应触摸事件
+        .setScrollAble(true)                       //是否支持手动滑动，默认true，禁用无法响应触摸事件
         .setAttachLifecycle(null)                  //开始/结束伴随生命周期
         .setCacheBoundary(false)                   //是否缓存边界View，默认false
         .setIndicator(null)                        //自定义指示器
@@ -105,7 +105,7 @@
     app:height="dimension"
     app:margin="dimension"
     app:drawable="reference"
-    app:alwaysShownOnOnlyOne="boolean"
+    app:alwaysShownWhenOne="boolean"
     app:drawable_unselected="reference"
     app:orientation="horizontal|vertical"
     app:ci_gravity="同LinearLayout"/>

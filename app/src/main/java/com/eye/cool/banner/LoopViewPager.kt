@@ -2,9 +2,9 @@ package com.eye.cool.banner
 
 import android.content.Context
 import android.database.DataSetObserver
-import android.support.v4.view.PagerAdapter
-import android.support.v4.view.ViewPager
 import android.util.AttributeSet
+import androidx.viewpager.widget.PagerAdapter
+import androidx.viewpager.widget.ViewPager
 
 /**
  * Created by ycb on 2019/4/4
@@ -21,15 +21,15 @@ open class LoopViewPager : ViewPager {
   }
 
   private fun init() {
-    super.setOnPageChangeListener(onPageChangeListener)
+    super.addOnPageChangeListener(onPageChangeListener)
   }
 
-  internal var mOuterPageChangeListeners: ArrayList<ViewPager.OnPageChangeListener>? = null
+  internal var mOuterPageChangeListeners: ArrayList<OnPageChangeListener>? = null
   private var mAdapter: LoopPagerAdapterWrapper? = null
   private var mBoundaryCaching = DEFAULT_BOUNDARY_CASHING
   private var indicator: IIndicator? = null
 
-  private val onPageChangeListener = object : ViewPager.OnPageChangeListener {
+  private val onPageChangeListener = object : OnPageChangeListener {
     private var mPreviousOffset = -1f
     private var mPreviousPosition = -1f
 
@@ -77,7 +77,7 @@ open class LoopViewPager : ViewPager {
       if (mAdapter != null) {
         val position = super@LoopViewPager.getCurrentItem()
         val realPosition = mAdapter!!.toRealPosition(position)
-        if (state == ViewPager.SCROLL_STATE_IDLE && (position == 0 || position == mAdapter!!.count - 1)) {
+        if (state == SCROLL_STATE_IDLE && (position == 0 || position == mAdapter!!.count - 1)) {
           setCurrentItem(realPosition, false)
         }
       }
@@ -146,7 +146,7 @@ open class LoopViewPager : ViewPager {
     }
   }
 
-  override fun setOnPageChangeListener(listener: ViewPager.OnPageChangeListener) {
+  override fun setOnPageChangeListener(listener: OnPageChangeListener) {
     if (mOuterPageChangeListeners == null) {
       mOuterPageChangeListeners = ArrayList()
     } else {
