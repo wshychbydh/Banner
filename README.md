@@ -34,7 +34,7 @@
 ###### 2、在项目的build.gradle中添加依赖
 ```
     dependencies {
-        implementation 'com.github.wshychbydh:banner:1.1.2'
+        implementation 'com.github.wshychbydh:banner:1.1.3'
     }
 ```
 

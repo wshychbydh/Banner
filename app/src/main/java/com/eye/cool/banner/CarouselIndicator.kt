@@ -215,6 +215,8 @@ class CarouselIndicator @JvmOverloads constructor(
 
     val indicatorPosition = position % childCount
 
+    if (lastPosition == indicatorPosition) return
+
     if (placeholder != null && indicatorPosition == childCount - 1) {
       placeholder!!.visibility = View.VISIBLE
       visibility = View.GONE

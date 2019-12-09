@@ -11,10 +11,10 @@ internal interface ICarousel {
     if (!params.recyclable && !params.reversible) return currentPage
     val size = getCount()
     if (params.reversible) {
-      if (params.direction == CarouselParams.LEFT) {
+      if (params.direction == CarouselParams.RIGHT_TO_LEFT) {
         val next = currentPage + 1
         return if (next % size == 0) {
-          params.direction = CarouselParams.RIGHT
+          params.direction = CarouselParams.LEFT_TO_RIGHT
           currentPage - 1
         } else {
           next
@@ -22,15 +22,15 @@ internal interface ICarousel {
       } else {
         val next = currentPage - 1
         return if (next % size <= 0) {
-          params.direction = CarouselParams.LEFT
-          currentPage + 1
+          params.direction = CarouselParams.RIGHT_TO_LEFT
+          0
         } else {
           next
         }
       }
     }
     if (params.recyclable) {
-      return if (params.direction == CarouselParams.LEFT) currentPage + 1 else currentPage - 1
+      return if (params.direction == CarouselParams.RIGHT_TO_LEFT) currentPage + 1 else currentPage - 1
     }
     return currentPage
   }

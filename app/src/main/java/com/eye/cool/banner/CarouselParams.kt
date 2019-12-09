@@ -12,7 +12,7 @@ class CarouselParams private constructor() {
   internal var recyclable = true
   internal var pauseWhenTouch = true
   internal var scrollDuration: Int? = null
-  internal var direction = LEFT
+  internal var direction = RIGHT_TO_LEFT
   internal var carouselAble = true
   internal var autoCarousel = true
   internal var scrollWhenOne = false
@@ -66,7 +66,8 @@ class CarouselParams private constructor() {
     }
 
     /**
-     * Rotation direction can only be {LEFT,RIGHT}, default RIGHT
+     * Scroll direction can only be {@link LEFT_TO_RIGHT,@link RIGHT_TO_LEFT}, default RIGHT_TO_LEFT
+     * It's equivalent to swiping to the left
      */
     fun setDirection(direction: Int): Builder {
       params.direction = direction
@@ -146,7 +147,7 @@ class CarouselParams private constructor() {
   }
 
   companion object {
-    const val LEFT = 0
-    const val RIGHT = 1
+    const val RIGHT_TO_LEFT = 0
+    const val LEFT_TO_RIGHT = 1
   }
 }

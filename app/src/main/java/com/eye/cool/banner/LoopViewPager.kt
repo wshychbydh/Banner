@@ -31,18 +31,17 @@ open class LoopViewPager : ViewPager {
 
   private val onPageChangeListener = object : OnPageChangeListener {
     private var mPreviousOffset = -1f
-    private var mPreviousPosition = -1f
+    private var mPreviousPosition = -1
 
     override fun onPageSelected(position: Int) {
-
       val realPosition = mAdapter!!.toRealPosition(position)
-      if (mPreviousPosition != realPosition.toFloat()) {
-        mPreviousPosition = realPosition.toFloat()
+      if (mPreviousPosition != realPosition) {
+        mPreviousPosition = realPosition
         mOuterPageChangeListeners?.forEach {
           it.onPageSelected(realPosition)
         }
+        indicator?.onPageSelected(realPosition)
       }
-      indicator?.onPageSelected(realPosition)
     }
 
     override fun onPageScrolled(position: Int, positionOffset: Float, positionOffsetPixels: Int) {
@@ -62,7 +61,7 @@ open class LoopViewPager : ViewPager {
         if (realPosition != mAdapter!!.realCount - 1) {
           it.onPageScrolled(realPosition, positionOffset, positionOffsetPixels)
         } else {
-          if (positionOffset > 0.5) {
+          if (positionOffset > 0.5f) {
             it.onPageScrolled(0, 0f, 0)
           } else {
             it.onPageScrolled(realPosition, 0f, 0)
@@ -132,9 +131,10 @@ open class LoopViewPager : ViewPager {
   }
 
   override fun setCurrentItem(item: Int) {
-    if (currentItem != item) {
-      setCurrentItem(item, true)
-    }
+//    if (currentItem != item) {
+//      setCurrentItem(item, true)
+//    }
+    setCurrentItem(item, true)
   }
 
   override fun addOnPageChangeListener(listener: OnPageChangeListener) {
@@ -158,7 +158,7 @@ open class LoopViewPager : ViewPager {
   private val dataObserver = object : DataSetObserver() {
     override fun onChanged() {
       mAdapter?.notifyDataSetChanged()
-      setCurrentItem(0, false)
+    //  setCurrentItem(0, false)
       indicator?.onDataChanged(currentItem, mAdapter?.realCount ?: 0)
     }
   }
@@ -177,8 +177,7 @@ open class LoopViewPager : ViewPager {
      */
     fun toRealPosition(position: Int, count: Int): Int {
       if (count <= 0) return position
-      var pos = position
-      pos -= 1
+      var pos = position - 1
       if (pos < 0) {
         pos += count
       } else {

@@ -68,16 +68,17 @@ class CarouselViewPager(context: Context, attrs: AttributeSet?)
 
   override fun onInterceptTouchEvent(ev: MotionEvent?): Boolean {
     return if (params.scrollAble) {
-      super.onInterceptTouchEvent(ev)
+      val count = adapter?.count ?: 0
+      if (!params.scrollWhenOne && count == 1) false else super.onInterceptTouchEvent(ev)
     } else false
   }
 
-  override fun onTouchEvent(ev: MotionEvent?): Boolean {
-    return if (params.scrollAble) {
-      val count = adapter?.count ?: 0
-      if (!params.scrollWhenOne && count == 1) false else super.onTouchEvent(ev)
-    } else false
-  }
+//  override fun onTouchEvent(ev: MotionEvent?): Boolean {
+//    return if (params.scrollAble) {
+//      val count = adapter?.count ?: 0
+//      if (!params.scrollWhenOne && count == 1) false else super.onTouchEvent(ev)
+//    } else false
+//  }
 
   override fun run() {
     currentItem = getNextPage(currentItem)
