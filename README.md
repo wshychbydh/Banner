@@ -111,4 +111,14 @@
     app:ci_gravity="同LinearLayout"/>
 ```
 
+#####   
+ 
+**Demo地址：(https://github.com/wshychbydh/SampleDemo)**    
+    
+##
+
+###### **欢迎fork，更希望你能贡献commit.** (*￣︶￣)    
+
+###### 联系方式 wshychbydh@gmail.com
+
 [![](https://jitpack.io/v/wshychbydh/banner.svg)](https://jitpack.io/#wshychbydh/banner)
