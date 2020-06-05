@@ -21,10 +21,10 @@ class CarouselIndicator @JvmOverloads constructor(
   private var indicatorMargin = 0
   private var indicatorWidth = 0
   private var indicatorHeight = 0
-  private var animatorResId = R.animator.scale_with_alpha
+  private var animatorResId = R.animator.banner_scale_with_alpha
   private var animatorReverseResId = 0
-  private var indicatorBackgroundResId = R.drawable.white_radius
-  private var indicatorUnselectedBackgroundResId = R.drawable.white_radius
+  private var indicatorBackgroundResId = R.drawable.banner_white_radius
+  private var indicatorUnselectedBackgroundResId = R.drawable.banner_white_radius
   private var animatorOut: Animator? = null
   private var animatorIn: Animator? = null
   private var immediateAnimatorOut: Animator? = null
@@ -42,10 +42,10 @@ class CarouselIndicator @JvmOverloads constructor(
       indicatorWidth: Int = 0,
       indicatorHeight: Int = 0,
       indicatorMargin: Int = 0,
-      @AnimatorRes animatorId: Int = R.animator.scale_with_alpha,
+      @AnimatorRes animatorId: Int = R.animator.banner_scale_with_alpha,
       @AnimatorRes animatorReverseId: Int = 0,
-      @DrawableRes indicatorBackgroundId: Int = R.drawable.white_radius,
-      @DrawableRes indicatorUnselectedBackgroundId: Int = R.drawable.white_radius
+      @DrawableRes indicatorBackgroundId: Int = R.drawable.banner_white_radius,
+      @DrawableRes indicatorUnselectedBackgroundId: Int = R.drawable.banner_white_radius
   ) {
 
     this.indicatorWidth = indicatorWidth
@@ -70,23 +70,23 @@ class CarouselIndicator @JvmOverloads constructor(
       return
     }
 
-    val typedArray = context.obtainStyledAttributes(attrs, R.styleable.CarouselIndicator)
-    indicatorWidth = typedArray.getDimensionPixelSize(R.styleable.CarouselIndicator_width, 0)
-    indicatorHeight = typedArray.getDimensionPixelSize(R.styleable.CarouselIndicator_height, 0)
-    indicatorMargin = typedArray.getDimensionPixelSize(R.styleable.CarouselIndicator_margin, 0)
+    val typedArray = context.obtainStyledAttributes(attrs, R.styleable.banner_carousel_indicator)
+    indicatorWidth = typedArray.getDimensionPixelSize(R.styleable.banner_carousel_indicator_banner_indicator_width, 0)
+    indicatorHeight = typedArray.getDimensionPixelSize(R.styleable.banner_carousel_indicator_banner_indicator_height, 0)
+    indicatorMargin = typedArray.getDimensionPixelSize(R.styleable.banner_carousel_indicator_banner_indicator_margin, 0)
 
-    animatorResId = typedArray.getResourceId(R.styleable.CarouselIndicator_animator, R.animator.scale_with_alpha)
-    animatorReverseResId = typedArray.getResourceId(R.styleable.CarouselIndicator_animator_reverse, 0)
-    indicatorBackgroundResId = typedArray.getResourceId(R.styleable.CarouselIndicator_drawable, R.drawable.white_radius)
-    indicatorUnselectedBackgroundResId = typedArray.getResourceId(R.styleable.CarouselIndicator_drawable_unselected, indicatorBackgroundResId)
+    animatorResId = typedArray.getResourceId(R.styleable.banner_carousel_indicator_banner_indicator_animator, R.animator.banner_scale_with_alpha)
+    animatorReverseResId = typedArray.getResourceId(R.styleable.banner_carousel_indicator_banner_indicator_animator_reverse, 0)
+    indicatorBackgroundResId = typedArray.getResourceId(R.styleable.banner_carousel_indicator_banner_indicator_drawable, R.drawable.banner_white_radius)
+    indicatorUnselectedBackgroundResId = typedArray.getResourceId(R.styleable.banner_carousel_indicator_banner_indicator_drawable_unselected, indicatorBackgroundResId)
 
-    val orientation = typedArray.getInt(R.styleable.CarouselIndicator_orientation, HORIZONTAL)
+    val orientation = typedArray.getInt(R.styleable.banner_carousel_indicator_banner_indicator_orientation, HORIZONTAL)
     setOrientation(if (orientation == VERTICAL) VERTICAL else HORIZONTAL)
 
-    val gravity = typedArray.getInt(R.styleable.CarouselIndicator_ci_gravity, Gravity.CENTER)
+    val gravity = typedArray.getInt(R.styleable.banner_carousel_indicator_banner_indicator_gravity, Gravity.CENTER)
     setGravity(if (gravity >= 0) gravity else Gravity.CENTER)
 
-    alwaysShownWhenOne = typedArray.getBoolean(R.styleable.CarouselIndicator_alwaysShownWhenOne, true)
+    alwaysShownWhenOne = typedArray.getBoolean(R.styleable.banner_carousel_indicator_banner_indicator_alwaysShownWhenOne, true)
     typedArray.recycle()
   }
 
@@ -95,7 +95,7 @@ class CarouselIndicator @JvmOverloads constructor(
     indicatorHeight = if (indicatorHeight <= 0) dip2px(DEFAULT_INDICATOR_WIDTH.toFloat()) else indicatorHeight
     indicatorMargin = if (indicatorMargin <= 0) dip2px(DEFAULT_INDICATOR_WIDTH.toFloat()) else indicatorMargin
 
-    animatorResId = if (animatorResId == 0) R.animator.scale_with_alpha else animatorResId
+    animatorResId = if (animatorResId == 0) R.animator.banner_scale_with_alpha else animatorResId
 
     animatorOut = createAnimatorOut(context)
     immediateAnimatorOut = createAnimatorOut(context)
@@ -105,7 +105,7 @@ class CarouselIndicator @JvmOverloads constructor(
     immediateAnimatorIn = createAnimatorIn(context)
     immediateAnimatorIn!!.duration = 0
 
-    indicatorBackgroundResId = if (indicatorBackgroundResId == 0) R.drawable.white_radius else indicatorBackgroundResId
+    indicatorBackgroundResId = if (indicatorBackgroundResId == 0) R.drawable.banner_white_radius else indicatorBackgroundResId
     indicatorUnselectedBackgroundResId = if (indicatorUnselectedBackgroundResId == 0) indicatorBackgroundResId else indicatorUnselectedBackgroundResId
   }
 

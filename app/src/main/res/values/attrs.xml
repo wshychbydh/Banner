@@ -1,23 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-  <declare-styleable name="CarouselIndicator">
-    <attr format="dimension" name="width"/>
-    <attr format="dimension" name="height"/>
-    <attr format="dimension" name="margin"/>
-    <attr format="reference" name="animator"/>
-    <attr format="reference" name="animator_reverse"/>
-    <attr format="reference" name="drawable"/>
-    <attr format="reference" name="drawable_unselected"/>
-    <attr format="boolean" name="alwaysShownWhenOne"/>
+  <declare-styleable name="banner_carousel_indicator">
+    <attr format="dimension" name="banner_indicator_width"/>
+    <attr format="dimension" name="banner_indicator_height"/>
+    <attr format="dimension" name="banner_indicator_margin"/>
+    <attr format="reference" name="banner_indicator_animator"/>
+    <attr format="reference" name="banner_indicator_animator_reverse"/>
+    <attr format="reference" name="banner_indicator_drawable"/>
+    <attr format="reference" name="banner_indicator_drawable_unselected"/>
+    <attr format="boolean" name="banner_indicator_alwaysShownWhenOne"/>
 
-    <attr format="enum" name="orientation">
+    <attr format="enum" name="banner_indicator_orientation">
       <!-- Defines an horizontal widget. -->
       <enum name="horizontal" value="0"/>
       <!-- Defines a vertical widget. -->
       <enum name="vertical" value="1"/>
     </attr>
 
-    <attr name="ci_gravity">
+    <attr name="banner_indicator_gravity">
       <!-- Push object to the top of its container, not changing its size. -->
       <flag name="top" value="0x30"/>
       <!-- Push object to the bottom of its container, not changing its size. -->

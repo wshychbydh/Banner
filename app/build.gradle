@@ -6,7 +6,8 @@ apply plugin: 'com.github.dcendents.android-maven'
 group = 'com.github.wshychbydh'
 
 android {
-    compileSdkVersion 28
+    compileSdkVersion 29
+    resourcePrefix 'banner_'
     defaultConfig {
         minSdkVersion 11
         versionCode 6
