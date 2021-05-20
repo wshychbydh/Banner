@@ -6,148 +6,146 @@ import androidx.lifecycle.Lifecycle
 /**
  *Created by ycb on 2019/2/20 0020
  */
-class CarouselParams private constructor() {
-  internal var interval: Long = 5000L
-  internal var reversible = false
-  internal var recyclable = true
-  internal var pauseWhenTouch = true
-  internal var scrollDuration: Int? = null
-  internal var direction = RIGHT_TO_LEFT
-  internal var carouselAble = true
-  internal var autoCarousel = true
-  internal var scrollWhenOne = false
-  internal var interpolator: Interpolator? = null
-  internal var scrollAble = true
-  internal var attachLifecycle: Lifecycle? = null
-  internal var cacheBoundary = false
-  internal var indicator: IIndicator? = null
+class CarouselParams private constructor(
+    internal val interval: Long,
+    internal val reversible: Boolean,
+    internal val recyclable: Boolean,
+    internal val pauseWhenTouch: Boolean,
+    internal val scrollDuration: Int?,
+    internal var direction: Int,
+    internal val carouselAble: Boolean,
+    internal val autoCarousel: Boolean,
+    internal val scrollWhenOne: Boolean,
+    internal val interpolator: Interpolator?,
+    internal val scrollAble: Boolean,
+    internal val attachLifecycle: Lifecycle?,
+    internal val cacheBoundary: Boolean,
+    internal val indicator: IIndicator?
+) {
 
-  class Builder {
-    private val params = CarouselParams()
+  companion object {
+    const val RIGHT_TO_LEFT = 0
+    const val LEFT_TO_RIGHT = 1
+    inline fun build(block: Builder.() -> Unit) = Builder().apply(block).build()
+  }
+
+  data class Builder(
+      var interval: Long = 5000L,
+      var reversible: Boolean = false,
+      var recyclable: Boolean = true,
+      var pauseWhenTouch: Boolean = true,
+      var scrollDuration: Int? = null,
+      var direction: Int = RIGHT_TO_LEFT,
+      var carouselAble: Boolean = true,
+      var autoCarousel: Boolean = true,
+      var scrollWhenOne: Boolean = false,
+      var interpolator: Interpolator? = null,
+      var scrollAble: Boolean = true,
+      var attachLifecycle: Lifecycle? = null,
+      var cacheBoundary: Boolean = false,
+      var indicator: IIndicator? = null
+  ) {
+    /**
+     * Switching interval time
+     * @param [millisecond] default 5s. unit(ms)
+     */
+    fun interval(millisecond: Long) = apply { this.interval = millisecond }
 
     /**
-     * Switching interval time, default 5s. unit(ms)
+     * Reverse rotation
+     * @param [reversible] default false
      */
-    fun setInterval(millisecond: Long): Builder {
-      params.interval = millisecond
-      return this
-    }
+    fun reversible(reversible: Boolean) = apply { this.reversible = reversible }
 
     /**
-     * Reverse rotation, default false
+     * Loop round robin
+     * @param [recyclable] default true
      */
-    fun setReversible(reversible: Boolean): Builder {
-      params.reversible = reversible
-      return this
-    }
+    fun recyclable(recyclable: Boolean) = apply { this.recyclable = recyclable }
 
     /**
-     * Loop round robin, default true
+     * Stops the round when pressed
+     * @param [pauseWhenTouch] default true
      */
-    fun setRecyclable(recyclable: Boolean): Builder {
-      params.recyclable = recyclable
-      return this
-    }
+    fun pauseWhenTouch(pauseWhenTouch: Boolean) = apply { this.pauseWhenTouch = pauseWhenTouch }
 
     /**
-     * Stops the round when pressed, default true
+     * The scrolling time of single picture.
+     * @param [millisecond] default 1s unit(milliseconds)
      */
-    fun setPauseWhenTouch(pauseWhenTouch: Boolean): Builder {
-      params.pauseWhenTouch = pauseWhenTouch
-      return this
-    }
+    fun scrollDuration(millisecond: Int) = apply { this.scrollDuration = millisecond }
 
     /**
-     * The rotation time of single picture is 1s by default. unit(milliseconds)
+     * Scroll direction can only be {@link LEFT_TO_RIGHT, @link RIGHT_TO_LEFT}
+     * @param [direction] default RIGHT_TO_LEFT, It's equivalent to swiping to the left
      */
-    fun setScrollDuration(millisecond: Int): Builder {
-      params.scrollDuration = millisecond
-      return this
-    }
+    fun direction(direction: Int) = apply { this.direction = direction }
 
     /**
-     * Scroll direction can only be {@link LEFT_TO_RIGHT,@link RIGHT_TO_LEFT}, default RIGHT_TO_LEFT
-     * It's equivalent to swiping to the left
+     * Scroll with only one image
+     * @param [scrollWhenOne] default false
      */
-    fun setDirection(direction: Int): Builder {
-      params.direction = direction
-      return this
-    }
+    fun scrollWhenOne(scrollWhenOne: Boolean) = apply { this.scrollWhenOne = scrollWhenOne }
 
     /**
-     * Scroll with only one image, default false
+     * Support to manual sliding
+     * @param [scrollAble] default true
      */
-    fun setScrollWhenOne(scrollWhenOne: Boolean): Builder {
-      params.scrollWhenOne = scrollWhenOne
-      return this
-    }
+    fun scrollAble(scrollAble: Boolean) = apply { this.scrollAble = scrollAble }
 
     /**
-     * Support to manual sliding, default true
+     * Support to round. If set false, it will never auto-rotation.
+     * @param [enable] default true
      */
-    fun setScrollAble(scrollAble: Boolean): Builder {
-      params.scrollAble = scrollAble
-      return this
-    }
+    fun enableCarousel(enable: Boolean) = apply { this.carouselAble = enable }
 
     /**
-     * Support to round, default true。If set false, it will never auto-rotation.
+     * Auto start/end round
+     * @param [autoCarousel] default true
      */
-    fun enableCarousel(enable: Boolean): Builder {
-      params.carouselAble = enable
-      return this
-    }
-
-    /**
-     * Auto start/end round, default true
-     */
-    fun setAutoCarousel(autoCarousel: Boolean): Builder {
-      params.autoCarousel = autoCarousel
-      return this
-    }
+    fun autoCarousel(autoCarousel: Boolean) = apply { this.autoCarousel = autoCarousel }
 
     /**
      * Scroller's interpolator for ViewPager
+     * @param [interpolator]
      */
-    fun setInterpolator(interpolator: Interpolator): Builder {
-      params.interpolator = interpolator
-      return this
-    }
+    fun interpolator(interpolator: Interpolator) = apply { this.interpolator = interpolator }
 
     /**
      * Automatically rounds by Lifecycle with OnResume-onPause
+     * @param [lifecycle]
      */
-    fun setAttachLifecycle(lifecycle: Lifecycle): Builder {
-      params.attachLifecycle = lifecycle
-      return this
-    }
+    fun attachLifecycle(lifecycle: Lifecycle) = apply { this.attachLifecycle = lifecycle }
 
     /**
      * If set to true, the boundary views (i.e. first and last) will never be destroyed
      * This may help to prevent "blinking" of some views
      *
-     * Cache the bounds View to prevent blinking, defaults false
+     * @param [cacheBoundary] Cache the bounds View to prevent blinking, defaults false
      */
-    fun setCacheBoundary(cacheBoundary: Boolean): Builder {
-      params.cacheBoundary = cacheBoundary
-      return this
-    }
+    fun cacheBoundary(cacheBoundary: Boolean) = apply { this.cacheBoundary = cacheBoundary }
 
     /**
      * Indicator which conjunction with Viewpager
+     * @param [indicator]
      */
-    fun setIndicator(indicator: IIndicator): Builder {
-      params.indicator = indicator
-      return this
-    }
+    fun indicator(indicator: IIndicator) = apply { this.indicator = indicator }
 
-    fun build(): CarouselParams {
-      return params
-    }
-  }
-
-  companion object {
-    const val RIGHT_TO_LEFT = 0
-    const val LEFT_TO_RIGHT = 1
+    fun build() = CarouselParams(
+        interval = interval,
+        reversible = reversible,
+        recyclable = recyclable,
+        pauseWhenTouch = pauseWhenTouch,
+        scrollDuration = scrollDuration,
+        direction = direction,
+        carouselAble = carouselAble,
+        autoCarousel = autoCarousel,
+        scrollWhenOne = scrollWhenOne,
+        interpolator = interpolator,
+        scrollAble = scrollAble,
+        attachLifecycle = attachLifecycle,
+        cacheBoundary = cacheBoundary,
+        indicator = indicator
+    )
   }
 }
